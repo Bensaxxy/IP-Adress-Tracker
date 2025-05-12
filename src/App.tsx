@@ -6,6 +6,8 @@ import InfoCard from "./components/InfoCard";
 import SearchBar from "./components/SearchBar";
 import Mapview from "./components/Mapview";
 import "leaflet/dist/leaflet.css";
+import mobileBackground from "/images/pattern-bg-mobile.png";
+import desktopBackground from "/images/pattern-bg-desktop.png";
 
 interface IpData {
   ip: string;
@@ -30,6 +32,20 @@ const App = () => {
   const [userPosition, setUserPosition] = useState<LatLngExpression | null>(
     null
   );
+
+  // Determine background image based on screen width
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   // Get user's current geolocation
   useEffect(() => {
@@ -97,7 +113,14 @@ const App = () => {
 
   return (
     <div className="relative" style={{ fontFamily: "var(--font-display)" }}>
-      <div className="bg-[url('./images/pattern-bg-mobile.png')] md:bg-[url('./images/pattern-bg-desktop.png')] bg-cover bg-no-repeat text-center pt-6 pb-30 flex flex-col items-center gap-4 px-2">
+      <div
+        className="bg-cover bg-no-repeat text-center pt-6 pb-30 flex flex-col items-center gap-4 px-2"
+        style={{
+          backgroundImage: `url(${
+            isDesktop ? desktopBackground : mobileBackground
+          })`,
+        }}
+      >
         <Header />
         <SearchBar onSearch={handleSearch} />
         {loading && <p className="text-white">Loading...</p>}
